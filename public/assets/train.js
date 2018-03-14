@@ -5,10 +5,25 @@ $(function () {
     database.ref("trainArr/").orderByChild("dateAdded")
     .on("child_added", function(snapshot) {
         
-        let currentTrain = snapshot.val();
         //sets a variable to the data recorded on each child append
+        let currentTrain = snapshot.val();
+        
+        //set var/let to bring in moment data
+        let timeNow = moment(); //create time now
+        let freqTime = currentTrain.freq; //set frequency time for math
+        let firstTime = moment(currentTrain.first, "hh:mm").subtract(1, "years");
+            //"Adding" the subtract 1 year because we need the create a time table that will let you subtract start-time from current-time
+        
+        //starting the math
+            let diffTime = moment().diff(moment(firstTime), "minutes");
+            console.log("DIFFERENCE IN TIME: " + diffTime);
 
-        console.log("we have firebase reply!")
+        let remainder = diffTime % freqTime
+            console.log("Remainder: " + remainder)
+
+        let minutesAway = freqTime - remainder
+        let nextTrain = moment().add(minutesAway, "minutes");
+
 
 
 
@@ -19,8 +34,8 @@ $(function () {
         var frequency = $("<td class='role'>").text(currentTrain.freq);
         var firstTrain = $("<td class='role'>").text(currentTrain.first);
         //need to define next arrival and min away with math
-        var nextArrival = $("<td class='role'>").text("");
-        var minAway = $("<td class='role'>").text("");
+        var nextArrival = $("<td class='arrival'>").text(moment(nextTrain).format("hh:mm A"));
+        var minAway = $("<td class='wait-time'>").text(minutesAway);
 
         //each new train will take data and place in this table
         newRow.append(trainName)
